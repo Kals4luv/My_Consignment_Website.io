@@ -54,11 +54,11 @@ export const Footer: React.FC = () => {
               </div>
               <div className="flex items-center">
                 <Phone className="h-4 w-4 mr-2 text-pink-400" />
-                <span>1-800-CONSIGN</span>
+                <span>+234 7011180318</span>
               </div>
               <div className="flex items-center">
                 <MapPin className="h-4 w-4 mr-2 text-yellow-400" />
-                <span>New York, NY</span>
+                <span>Aba,Abia State.Nigeria</span>
               </div>
             </div>
           </div>
