@@ -568,6 +568,10 @@ export const FlightSection: React.FC = () => {
                         ${selectedFlight.price}
                       </div>
                       <div className="text-sm text-gray-600">per person</div>
+                    </div>
+                  </div>
+                </div>
+
                 <form onSubmit={handleBooking}>
                   {bookingStep === 1 && (
                     <div className="space-y-4">
