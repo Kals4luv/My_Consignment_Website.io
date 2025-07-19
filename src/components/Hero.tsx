@@ -53,7 +53,12 @@ export const Hero: React.FC<HeroProps> = ({ activeSection }) => {
             ))}
           </div>
           <button className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-10 py-4 rounded-full font-bold text-lg hover:from-yellow-500 hover:to-orange-600 transition-all transform hover:scale-110 shadow-2xl animate-bounce hover:animate-none">
-            Get Started
+            <span onClick={() => {
+              const section = activeSection === 'consignment' ? 'consignment' : 'flights';
+              document.querySelector(`[data-section="${section}"]`)?.scrollIntoView({ behavior: 'smooth' });
+            }}>
+              Get Started
+            </span>
           </button>
         </div>
       </div>

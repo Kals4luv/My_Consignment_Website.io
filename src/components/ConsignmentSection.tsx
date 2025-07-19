@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Filter, Star, Heart, MapPin, SlidersHorizontal, X } from 'lucide-react';
+import { Search, Filter, Star, Heart, MapPin, SlidersHorizontal, X, Plus, ShoppingCart, Eye } from 'lucide-react';
 
 interface ConsignmentItem {
   id: string;
@@ -105,6 +105,9 @@ export const ConsignmentSection: React.FC = () => {
   const [sortBy, setSortBy] = useState('price-low');
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [favorites, setFavorites] = useState<string[]>([]);
+  const [cart, setCart] = useState<string[]>([]);
+  const [showItemModal, setShowItemModal] = useState<ConsignmentItem | null>(null);
+  const [showListingModal, setShowListingModal] = useState(false);
 
   const categories = ['All', 'Fashion', 'Accessories', 'Electronics', 'Home & Garden'];
   const conditions = ['All', 'Like New', 'Excellent', 'Very Good', 'Good'];
@@ -143,6 +146,18 @@ export const ConsignmentSection: React.FC = () => {
         ? prev.filter(id => id !== itemId)
         : [...prev, itemId]
     );
+  };
+
+  const addToCart = (itemId: string) => {
+    setCart(prev => 
+      prev.includes(itemId) 
+        ? prev.filter(id => id !== itemId)
+        : [...prev, itemId]
+    );
+  };
+
+  const viewItemDetails = (item: ConsignmentItem) => {
+    setShowItemModal(item);
   };
 
   return (
@@ -366,8 +381,26 @@ export const ConsignmentSection: React.FC = () => {
                     {item.location}
                   </div>
                   <button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3 rounded-full hover:from-purple-600 hover:to-pink-600 transition-all transform hover:scale-105 font-semibold shadow-lg">
-                    View Details
+                    <div className="flex items-center justify-center space-x-2">
+                      <Eye className="h-4 w-4" />
+                      <span onClick={() => viewItemDetails(item)}>View Details</span>
+                    </div>
                   </button>
+                  <div className="flex space-x-2 mt-2">
+                    <button 
+                      onClick={() => addToCart(item.id)}
+                      className={`flex-1 py-2 rounded-full font-medium transition-all transform hover:scale-105 ${
+                        cart.includes(item.id)
+                          ? 'bg-gradient-to-r from-green-400 to-emerald-500 text-white'
+                          : 'bg-gradient-to-r from-orange-400 to-yellow-500 text-white hover:from-orange-500 hover:to-yellow-600'
+                      }`}
+                    >
+                      <div className="flex items-center justify-center space-x-1">
+                        <ShoppingCart className="h-4 w-4" />
+                        <span className="text-sm">{cart.includes(item.id) ? 'In Cart' : 'Add to Cart'}</span>
+                      </div>
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
@@ -398,10 +431,183 @@ export const ConsignmentSection: React.FC = () => {
               Join thousands of sellers who trust us with their consignment items
             </p>
             <button className="bg-gradient-to-r from-green-400 to-emerald-500 text-white px-10 py-4 rounded-full font-bold text-lg hover:from-green-500 hover:to-emerald-600 transition-all transform hover:scale-110 shadow-xl">
-              List Your Items
+              <div 
+                className="flex items-center space-x-2"
+                onClick={() => setShowListingModal(true)}
+              >
+                <Plus className="h-5 w-5" />
+                <span>List Your Items</span>
+              </div>
             </button>
           </div>
         </div>
+
+        {/* Item Details Modal */}
+        {showItemModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+            <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto relative shadow-2xl">
+              <button
+                onClick={() => setShowItemModal(null)}
+                className="absolute top-4 right-4 text-gray-400 hover:text-purple-600 transition-colors z-10 bg-white rounded-full p-2 shadow-lg"
+              >
+                <X className="h-6 w-6" />
+              </button>
+              
+              <img 
+                src={showItemModal.image} 
+                alt={showItemModal.title}
+                className="w-full h-64 object-cover rounded-t-2xl"
+              />
+              
+              <div className="p-6">
+                <div className="flex justify-between items-start mb-4">
+                  <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                    {showItemModal.title}
+                  </h2>
+                  <div className="text-right">
+                    <div className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                      ${showItemModal.price}
+                    </div>
+                    {showItemModal.originalPrice && (
+                      <div className="text-lg text-gray-500 line-through">
+                        ${showItemModal.originalPrice}
+                      </div>
+                    )}
+                  </div>
+                </div>
+                
+                <p className="text-gray-700 mb-4">{showItemModal.description}</p>
+                
+                <div className="grid grid-cols-2 gap-4 mb-6">
+                  <div>
+                    <span className="font-semibold text-gray-700">Condition:</span>
+                    <span className="ml-2 bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 px-2 py-1 rounded-full text-sm">
+                      {showItemModal.condition}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="font-semibold text-gray-700">Category:</span>
+                    <span className="ml-2 bg-gradient-to-r from-purple-100 to-pink-100 text-purple-800 px-2 py-1 rounded-full text-sm">
+                      {showItemModal.category}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="font-semibold text-gray-700">Seller:</span>
+                    <span className="ml-2">{showItemModal.seller}</span>
+                  </div>
+                  <div>
+                    <span className="font-semibold text-gray-700">Location:</span>
+                    <span className="ml-2">{showItemModal.location}</span>
+                  </div>
+                </div>
+                
+                <div className="flex items-center mb-6">
+                  <Star className="h-5 w-5 fill-yellow-400 text-yellow-400 mr-1" />
+                  <span className="font-semibold">{showItemModal.rating}</span>
+                  <span className="text-gray-500 ml-2">Seller Rating</span>
+                </div>
+                
+                <div className="flex space-x-4">
+                  <button 
+                    onClick={() => addToCart(showItemModal.id)}
+                    className={`flex-1 py-3 rounded-full font-semibold transition-all transform hover:scale-105 ${
+                      cart.includes(showItemModal.id)
+                        ? 'bg-gradient-to-r from-green-400 to-emerald-500 text-white'
+                        : 'bg-gradient-to-r from-orange-400 to-yellow-500 text-white hover:from-orange-500 hover:to-yellow-600'
+                    }`}
+                  >
+                    <div className="flex items-center justify-center space-x-2">
+                      <ShoppingCart className="h-5 w-5" />
+                      <span>{cart.includes(showItemModal.id) ? 'Remove from Cart' : 'Add to Cart'}</span>
+                    </div>
+                  </button>
+                  <button 
+                    onClick={() => toggleFavorite(showItemModal.id)}
+                    className="px-6 py-3 border-2 border-pink-300 rounded-full hover:bg-pink-50 transition-all transform hover:scale-105"
+                  >
+                    <Heart 
+                      className={`h-5 w-5 ${favorites.includes(showItemModal.id) ? 'fill-pink-500 text-pink-500' : 'text-pink-400'}`}
+                    />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* List Item Modal */}
+        {showListingModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+            <div className="bg-white rounded-2xl max-w-md w-full p-8 relative shadow-2xl">
+              <button
+                onClick={() => setShowListingModal(false)}
+                className="absolute top-4 right-4 text-gray-400 hover:text-purple-600 transition-colors"
+              >
+                <X className="h-6 w-6" />
+              </button>
+              
+              <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-6">
+                List Your Item
+              </h2>
+              
+              <form className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Item Title</label>
+                  <input
+                    type="text"
+                    className="w-full px-4 py-3 border-2 border-purple-200 rounded-full focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
+                    placeholder="Enter item title"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                  <select className="w-full px-4 py-3 border-2 border-purple-200 rounded-full focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all">
+                    <option>Fashion</option>
+                    <option>Accessories</option>
+                    <option>Electronics</option>
+                    <option>Home & Garden</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Price ($)</label>
+                  <input
+                    type="number"
+                    className="w-full px-4 py-3 border-2 border-purple-200 rounded-full focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
+                    placeholder="Enter price"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Condition</label>
+                  <select className="w-full px-4 py-3 border-2 border-purple-200 rounded-full focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all">
+                    <option>Like New</option>
+                    <option>Excellent</option>
+                    <option>Very Good</option>
+                    <option>Good</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                  <textarea
+                    rows={3}
+                    className="w-full px-4 py-3 border-2 border-purple-200 rounded-2xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
+                    placeholder="Describe your item"
+                  ></textarea>
+                </div>
+                
+                <button
+                  type="submit"
+                  className="w-full bg-gradient-to-r from-green-400 to-emerald-500 text-white py-3 rounded-full hover:from-green-500 hover:to-emerald-600 transition-all transform hover:scale-105 font-semibold shadow-lg"
+                >
+                  List Item
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Calendar, MapPin, Users, Plane, Clock, Star, SlidersHorizontal, X } from 'lucide-react';
+import { Search, Calendar, MapPin, Users, Plane, Clock, Star, SlidersHorizontal, X, CreditCard, Download, Share2 } from 'lucide-react';
 
 interface Flight {
   id: string;
@@ -93,6 +93,16 @@ export const FlightSection: React.FC = () => {
   const [maxStops, setMaxStops] = useState(2);
   const [minRating, setMinRating] = useState(0);
 
+  const [selectedFlight, setSelectedFlight] = useState<Flight | null>(null);
+  const [showBookingModal, setShowBookingModal] = useState(false);
+  const [bookingStep, setBookingStep] = useState(1);
+  const [passengerInfo, setPassengerInfo] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: ''
+  });
+
   const airlines = ['All', 'American Airlines', 'Delta Air Lines', 'United Airlines', 'Southwest Airlines'];
 
   const handleSearch = (e: React.FormEvent) => {
@@ -120,6 +130,41 @@ export const FlightSection: React.FC = () => {
     setMaxStops(2);
     setMinRating(0);
     setSortBy('price');
+  };
+
+  const selectFlight = (flight: Flight) => {
+    setSelectedFlight(flight);
+    setShowBookingModal(true);
+    setBookingStep(1);
+  };
+
+  const handleBooking = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (bookingStep < 3) {
+      setBookingStep(bookingStep + 1);
+    } else {
+      // Complete booking
+      alert('Booking confirmed! You will receive a confirmation email shortly.');
+      setShowBookingModal(false);
+      setBookingStep(1);
+    }
+  };
+
+  const downloadItinerary = () => {
+    alert('Itinerary downloaded! Check your downloads folder.');
+  };
+
+  const shareItinerary = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: 'My Flight Itinerary',
+        text: `Flight from ${searchParams.from} to ${searchParams.to}`,
+        url: window.location.href
+      });
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      alert('Flight details copied to clipboard!');
+    }
   };
 
   return (
@@ -444,7 +489,13 @@ export const FlightSection: React.FC = () => {
                           <div className="text-sm text-gray-600">per person</div>
                         </div>
                         <button className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-8 py-3 rounded-full hover:from-blue-600 hover:to-purple-700 transition-all transform hover:scale-105 font-semibold shadow-lg">
-                          Select
+                          <div 
+                            className="flex items-center space-x-2"
+                            onClick={() => selectFlight(flight)}
+                          >
+                            <CreditCard className="h-4 w-4" />
+                            <span>Select Flight</span>
+                          </div>
                         </button>
                       </div>
                     </div>
@@ -466,6 +517,212 @@ export const FlightSection: React.FC = () => {
                 </div>
               </div>
             )}
+          </div>
+        )}
+
+        {/* Booking Modal */}
+        {showBookingModal && selectedFlight && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+            <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto relative shadow-2xl">
+              <button
+                onClick={() => setShowBookingModal(false)}
+                className="absolute top-4 right-4 text-gray-400 hover:text-blue-600 transition-colors z-10 bg-white rounded-full p-2 shadow-lg"
+              >
+                <X className="h-6 w-6" />
+              </button>
+              
+              <div className="p-8">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                    Book Your Flight
+                  </h2>
+                  <div className="flex space-x-2">
+                    {[1, 2, 3].map(step => (
+                      <div
+                        key={step}
+                        className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
+                          step <= bookingStep
+                            ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white'
+                            : 'bg-gray-200 text-gray-500'
+                        }`}
+                      >
+                        {step}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Flight Summary */}
+                <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-4 mb-6 border-2 border-blue-200">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h3 className="font-semibold text-lg">{selectedFlight.airline}</h3>
+                      <div className="flex items-center space-x-4 text-sm text-gray-600">
+                        <span>{selectedFlight.from} → {selectedFlight.to}</span>
+                        <span>{selectedFlight.departureTime} - {selectedFlight.arrivalTime}</span>
+                        <span>{selectedFlight.duration}</span>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                        ${selectedFlight.price}
+                      </div>
+                      <div className="text-sm text-gray-600">per person</div>
+                <form onSubmit={handleBooking}>
+                  {bookingStep === 1 && (
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold mb-4">Passenger Information</h3>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                          <input
+                            type="text"
+                            value={passengerInfo.firstName}
+                            onChange={(e) => setPassengerInfo({...passengerInfo, firstName: e.target.value})}
+                            className="w-full px-4 py-3 border-2 border-blue-200 rounded-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                          <input
+                            type="text"
+                            value={passengerInfo.lastName}
+                            onChange={(e) => setPassengerInfo({...passengerInfo, lastName: e.target.value})}
+                            className="w-full px-4 py-3 border-2 border-blue-200 rounded-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                            required
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <input
+                          type="email"
+                          value={passengerInfo.email}
+                          onChange={(e) => setPassengerInfo({...passengerInfo, email: e.target.value})}
+                          className="w-full px-4 py-3 border-2 border-blue-200 rounded-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                        <input
+                          type="tel"
+                          value={passengerInfo.phone}
+                          onChange={(e) => setPassengerInfo({...passengerInfo, phone: e.target.value})}
+                          className="w-full px-4 py-3 border-2 border-blue-200 rounded-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                          required
+                        />
+                      </div>
+                    </div>
+                  )}
+                    </div>
+                  {bookingStep === 2 && (
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold mb-4">Payment Information</h3>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Card Number</label>
+                        <input
+                          type="text"
+                          placeholder="1234 5678 9012 3456"
+                          className="w-full px-4 py-3 border-2 border-blue-200 rounded-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                          required
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Expiry Date</label>
+                          <input
+                            type="text"
+                            placeholder="MM/YY"
+                            className="w-full px-4 py-3 border-2 border-blue-200 rounded-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">CVV</label>
+                          <input
+                            type="text"
+                            placeholder="123"
+                            className="w-full px-4 py-3 border-2 border-blue-200 rounded-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                            required
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Cardholder Name</label>
+                        <input
+                          type="text"
+                          className="w-full px-4 py-3 border-2 border-blue-200 rounded-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                          required
+                        />
+                      </div>
+                    </div>
+                  )}
+                  </div>
+                  {bookingStep === 3 && (
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold mb-4">Booking Confirmation</h3>
+                      <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-6 border-2 border-green-200">
+                        <div className="text-center">
+                          <div className="text-4xl mb-4">✈️</div>
+                          <h4 className="text-xl font-bold text-green-800 mb-2">Booking Confirmed!</h4>
+                          <p className="text-green-700 mb-4">
+                            Your flight from {selectedFlight.from} to {selectedFlight.to} has been booked successfully.
+                          </p>
+                          <div className="flex justify-center space-x-4">
+                            <button
+                              type="button"
+                              onClick={downloadItinerary}
+                              className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-2 rounded-full hover:from-blue-600 hover:to-purple-700 transition-all transform hover:scale-105 flex items-center space-x-2"
+                            >
+                              <Download className="h-4 w-4" />
+                              <span>Download</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={shareItinerary}
+                              className="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-2 rounded-full hover:from-green-600 hover:to-emerald-700 transition-all transform hover:scale-105 flex items-center space-x-2"
+                            >
+                              <Share2 className="h-4 w-4" />
+                              <span>Share</span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                  <div className="flex justify-between mt-8">
+                    {bookingStep > 1 && bookingStep < 3 && (
+                      <button
+                        type="button"
+                        onClick={() => setBookingStep(bookingStep - 1)}
+                        className="bg-gray-300 text-gray-700 px-6 py-3 rounded-full hover:bg-gray-400 transition-all"
+                      >
+                        Back
+                      </button>
+                    )}
+                    {bookingStep < 3 ? (
+                      <button
+                        type="submit"
+                        className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-8 py-3 rounded-full hover:from-blue-600 hover:to-purple-700 transition-all transform hover:scale-105 font-semibold shadow-lg ml-auto"
+                      >
+                        {bookingStep === 1 ? 'Continue to Payment' : 'Complete Booking'}
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => setShowBookingModal(false)}
+                        className="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-8 py-3 rounded-full hover:from-green-600 hover:to-emerald-700 transition-all transform hover:scale-105 font-semibold shadow-lg ml-auto"
+                      >
+                        Close
+                      </button>
+                    )}
+                  </div>
+                </form>
+              </div>
+            </div>
           </div>
         )}
       </div>

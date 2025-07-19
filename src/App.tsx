@@ -21,11 +21,15 @@ function App() {
         />
         <Hero activeSection={activeSection} />
         
-        <main>
+        <main data-section={activeSection}>
           {activeSection === 'consignment' ? (
-            <ConsignmentSection />
+            <div data-section="consignment">
+              <ConsignmentSection />
+            </div>
           ) : (
-            <FlightSection />
+            <div data-section="flights">
+              <FlightSection />
+            </div>
           )}
         </main>
         
