@@ -616,7 +616,6 @@ export const FlightSection: React.FC = () => {
                       </div>
                     </div>
                   )}
-                    </div>
                   {bookingStep === 2 && (
                     <div className="space-y-4">
                       <h3 className="text-lg font-semibold mb-4">Payment Information</h3>
@@ -659,7 +658,6 @@ export const FlightSection: React.FC = () => {
                       </div>
                     </div>
                   )}
-                  </div>
                   {bookingStep === 3 && (
                     <div className="space-y-4">
                       <h3 className="text-lg font-semibold mb-4">Booking Confirmation</h3>
@@ -692,7 +690,7 @@ export const FlightSection: React.FC = () => {
                       </div>
                     </div>
                   )}
-                </div>
+                
                   <div className="flex justify-between mt-8">
                     {bookingStep > 1 && bookingStep < 3 && (
                       <button
