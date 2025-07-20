@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Search, Filter, Star, Heart, MapPin, SlidersHorizontal, X, Plus, ShoppingCart, Eye } from 'lucide-react';
+import { useCart } from '../contexts/CartContext';
 
 interface ConsignmentItem {
   id: string;
@@ -109,6 +110,8 @@ export const ConsignmentSection: React.FC = () => {
   const [showItemModal, setShowItemModal] = useState<ConsignmentItem | null>(null);
   const [showListingModal, setShowListingModal] = useState(false);
 
+  const { addToCart, removeFromCart, isInCart } = useCart();
+
   const categories = ['All', 'Fashion', 'Accessories', 'Electronics', 'Home & Garden'];
   const conditions = ['All', 'Like New', 'Excellent', 'Very Good', 'Good'];
   const locations = ['All', 'New York, NY', 'Los Angeles, CA', 'Chicago, IL', 'Boston, MA', 'Miami, FL', 'Seattle, WA'];
@@ -148,12 +151,21 @@ export const ConsignmentSection: React.FC = () => {
     );
   };
 
-  const addToCart = (itemId: string) => {
-    setCart(prev => 
-      prev.includes(itemId) 
-        ? prev.filter(id => id !== itemId)
-        : [...prev, itemId]
-    );
+  const handleAddToCart = (item: ConsignmentItem) => {
+    if (isInCart(item.id)) {
+      removeFromCart(item.id);
+    } else {
+      addToCart({
+        id: item.id,
+        title: item.title,
+        price: item.price,
+        originalPrice: item.originalPrice,
+        image: item.image,
+        condition: item.condition,
+        seller: item.seller,
+        category: item.category
+      });
+    }
   };
 
   const viewItemDetails = (item: ConsignmentItem) => {
@@ -388,16 +400,16 @@ export const ConsignmentSection: React.FC = () => {
                   </button>
                   <div className="flex space-x-2 mt-2">
                     <button 
-                      onClick={() => addToCart(item.id)}
+                      onClick={() => handleAddToCart(item)}
                       className={`flex-1 py-2 rounded-full font-medium transition-all transform hover:scale-105 ${
-                        cart.includes(item.id)
+                        isInCart(item.id)
                           ? 'bg-gradient-to-r from-green-400 to-emerald-500 text-white'
                           : 'bg-gradient-to-r from-orange-400 to-yellow-500 text-white hover:from-orange-500 hover:to-yellow-600'
                       }`}
                     >
                       <div className="flex items-center justify-center space-x-1">
                         <ShoppingCart className="h-4 w-4" />
-                        <span className="text-sm">{cart.includes(item.id) ? 'In Cart' : 'Add to Cart'}</span>
+                        <span className="text-sm">{isInCart(item.id) ? 'In Cart' : 'Add to Cart'}</span>
                       </div>
                     </button>
                   </div>
@@ -509,16 +521,16 @@ export const ConsignmentSection: React.FC = () => {
                 
                 <div className="flex space-x-4">
                   <button 
-                    onClick={() => addToCart(showItemModal.id)}
+                    onClick={() => handleAddToCart(showItemModal)}
                     className={`flex-1 py-3 rounded-full font-semibold transition-all transform hover:scale-105 ${
-                      cart.includes(showItemModal.id)
+                      isInCart(showItemModal.id)
                         ? 'bg-gradient-to-r from-green-400 to-emerald-500 text-white'
                         : 'bg-gradient-to-r from-orange-400 to-yellow-500 text-white hover:from-orange-500 hover:to-yellow-600'
                     }`}
                   >
                     <div className="flex items-center justify-center space-x-2">
                       <ShoppingCart className="h-5 w-5" />
-                      <span>{cart.includes(showItemModal.id) ? 'Remove from Cart' : 'Add to Cart'}</span>
+                      <span>{isInCart(showItemModal.id) ? 'Remove from Cart' : 'Add to Cart'}</span>
                     </div>
                   </button>
                   <button 

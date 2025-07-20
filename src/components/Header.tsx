@@ -1,21 +1,25 @@
 import React from 'react';
-import { Plane, Package, User, Menu, X } from 'lucide-react';
+import { Plane, Package, User, Menu, X, ShoppingCart } from 'lucide-react';
 import { useUser } from '../contexts/UserContext';
+import { useCart } from '../contexts/CartContext';
 
 interface HeaderProps {
   activeSection: 'consignment' | 'flights';
   setActiveSection: (section: 'consignment' | 'flights') => void;
   setShowAuthModal: (show: boolean) => void;
   setShowBookingManagement: (show: boolean) => void;
+  setShowCart: (show: boolean) => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({ 
   activeSection, 
   setActiveSection, 
   setShowAuthModal,
-  setShowBookingManagement
+  setShowBookingManagement,
+  setShowCart
 }) => {
   const { user, logout } = useUser();
+  const { getTotalItems } = useCart();
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
 
   return (
@@ -72,6 +76,17 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* User Menu */}
           <div className="hidden md:flex items-center space-x-4">
+            <button
+              onClick={() => setShowCart(true)}
+              className="relative bg-white bg-opacity-20 text-white p-2 rounded-full hover:bg-opacity-30 transition-all transform hover:scale-105"
+            >
+              <ShoppingCart className="h-5 w-5" />
+              {getTotalItems() > 0 && (
+                <span className="absolute -top-2 -right-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center font-bold animate-pulse">
+                  {getTotalItems()}
+                </span>
+              )}
+            </button>
             {user ? (
               <div className="flex items-center space-x-3">
                 <img
@@ -157,6 +172,23 @@ export const Header: React.FC<HeaderProps> = ({
                 My Bookings
               </button>
             )}
+          </div>
+          <div className="px-4 py-3 border-t border-white border-opacity-20 bg-gradient-to-b from-pink-600 to-orange-500">
+            <button
+              onClick={() => {
+                setShowCart(true);
+                setMobileMenuOpen(false);
+              }}
+              className="relative bg-white bg-opacity-20 text-white p-3 rounded-full hover:bg-opacity-30 transition-all w-full flex items-center justify-center space-x-2 mb-3"
+            >
+              <ShoppingCart className="h-5 w-5" />
+              <span>Cart</span>
+              {getTotalItems() > 0 && (
+                <span className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center font-bold">
+                  {getTotalItems()}
+                </span>
+              )}
+            </button>
           </div>
           <div className="px-4 py-3 border-t border-white border-opacity-20 bg-gradient-to-b from-pink-600 to-orange-500">
             {user ? (
