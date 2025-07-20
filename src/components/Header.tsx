@@ -23,10 +23,16 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
-            <div className="flex-shrink-0 flex items-center">
+            <button 
+              onClick={() => {
+                setActiveSection('consignment');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              className="flex-shrink-0 flex items-center hover:scale-105 transition-transform cursor-pointer"
+            >
               <Package className="h-8 w-8 text-white mr-2 animate-bounce" />
               <span className="text-xl font-bold text-white">kalsXprezz</span>
-            </div>
+            </button>
           </div>
 
           {/* Desktop Navigation */}
