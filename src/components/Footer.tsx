@@ -1,7 +1,11 @@
 import React from 'react';
 import { Package, Mail, Phone, MapPin, Facebook, Twitter, Instagram } from 'lucide-react';
 
-export const Footer: React.FC = () => {
+interface FooterProps {
+  setShowBookingManagement?: (show: boolean) => void;
+}
+
+export const Footer: React.FC<FooterProps> = ({ setShowBookingManagement }) => {
   return (
     <footer className="bg-gradient-to-br from-purple-900 via-pink-900 to-indigo-900 text-white relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-600 opacity-10"></div>
@@ -39,7 +43,14 @@ export const Footer: React.FC = () => {
             <h3 className="text-lg font-semibold mb-4 bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">Flights</h3>
             <ul className="space-y-2 text-white text-opacity-70">
               <li><a href="#" className="hover:text-pink-400 transition-colors">Search Flights</a></li>
-              <li><a href="#" className="hover:text-pink-400 transition-colors">Manage Booking</a></li>
+              <li>
+                <button 
+                  onClick={() => setShowBookingManagement?.(true)}
+                  className="hover:text-pink-400 transition-colors text-left"
+                >
+                  Manage Booking
+                </button>
+              </li>
               <li><a href="#" className="hover:text-pink-400 transition-colors">Flight Status</a></li>
               <li><a href="#" className="hover:text-pink-400 transition-colors">Travel Insurance</a></li>
             </ul>

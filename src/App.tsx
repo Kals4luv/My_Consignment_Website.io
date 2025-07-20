@@ -5,11 +5,13 @@ import { ConsignmentSection } from './components/ConsignmentSection';
 import { FlightSection } from './components/FlightSection';
 import { Footer } from './components/Footer';
 import { AuthModal } from './components/AuthModal';
+import { BookingManagement } from './components/BookingManagement';
 import { UserProvider } from './contexts/UserContext';
 
 function App() {
   const [activeSection, setActiveSection] = useState<'consignment' | 'flights'>('consignment');
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showBookingManagement, setShowBookingManagement] = useState(false);
 
   return (
     <UserProvider>
@@ -18,6 +20,7 @@ function App() {
           activeSection={activeSection} 
           setActiveSection={setActiveSection}
           setShowAuthModal={setShowAuthModal}
+          setShowBookingManagement={setShowBookingManagement}
         />
         <Hero activeSection={activeSection} />
         
@@ -34,9 +37,14 @@ function App() {
         </main>
         
         <Footer />
+        <Footer setShowBookingManagement={setShowBookingManagement} />
         
         {showAuthModal && (
           <AuthModal onClose={() => setShowAuthModal(false)} />
+        )}
+        
+        {showBookingManagement && (
+          <BookingManagement onClose={() => setShowBookingManagement(false)} />
         )}
       </div>
     </UserProvider>

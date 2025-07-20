@@ -6,12 +6,14 @@ interface HeaderProps {
   activeSection: 'consignment' | 'flights';
   setActiveSection: (section: 'consignment' | 'flights') => void;
   setShowAuthModal: (show: boolean) => void;
+  setShowBookingManagement: (show: boolean) => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({ 
   activeSection, 
   setActiveSection, 
-  setShowAuthModal 
+  setShowAuthModal,
+  setShowBookingManagement
 }) => {
   const { user, logout } = useUser();
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
@@ -51,6 +53,15 @@ export const Header: React.FC<HeaderProps> = ({
               <Plane className="h-4 w-4 mr-1" />
               Flights
             </button>
+            {user && (
+              <button
+                onClick={() => setShowBookingManagement(true)}
+                className="inline-flex items-center px-3 pt-1 text-sm font-medium text-white text-opacity-80 hover:text-white hover:bg-white hover:bg-opacity-10 rounded transition-colors"
+              >
+                <User className="h-4 w-4 mr-1" />
+                My Bookings
+              </button>
+            )}
           </nav>
 
           {/* User Menu */}
@@ -128,6 +139,18 @@ export const Header: React.FC<HeaderProps> = ({
               <Plane className="h-4 w-4 inline mr-2" />
               Flights
             </button>
+            {user && (
+              <button
+                onClick={() => {
+                  setShowBookingManagement(true);
+                  setMobileMenuOpen(false);
+                }}
+                className="block px-3 py-2 text-base font-medium w-full text-left text-white text-opacity-80 hover:text-white hover:bg-white hover:bg-opacity-10 rounded-lg"
+              >
+                <User className="h-4 w-4 inline mr-2" />
+                My Bookings
+              </button>
+            )}
           </div>
           <div className="px-4 py-3 border-t border-white border-opacity-20 bg-gradient-to-b from-pink-600 to-orange-500">
             {user ? (
