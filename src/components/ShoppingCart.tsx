@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, ShoppingCart, Plus, Minus, Trash2, CreditCard, Package } from 'lucide-react';
+import { X, ShoppingCart as ShoppingCartIcon, Plus, Minus, Trash2, CreditCard, Package } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 
 interface ShoppingCartProps {
@@ -342,7 +342,7 @@ export const ShoppingCart: React.FC<ShoppingCartProps> = ({ onClose }) => {
             </>
           ) : (
             <div className="text-center py-12">
-              <ShoppingCart className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+              <ShoppingCartIcon className="h-16 w-16 text-gray-400 mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-gray-600 mb-2">Your cart is empty</h3>
               <p className="text-gray-500 mb-6">Add some items to your cart to get started!</p>
               <button
