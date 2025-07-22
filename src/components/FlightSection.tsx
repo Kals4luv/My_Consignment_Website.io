@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Search, Calendar, MapPin, Users, Plane, Clock, Star, SlidersHorizontal, X, CreditCard, Download, Share2 } from 'lucide-react';
 import { MapView, getCityCoordinates } from './MapView';
+import { FlightTracker } from './FlightTracker';
 
 interface Flight {
   id: string;
@@ -104,6 +105,7 @@ export const FlightSection: React.FC = () => {
     email: '',
     phone: ''
   });
+  const [showFlightTracker, setShowFlightTracker] = useState(false);
 
   const airlines = ['All', 'American Airlines', 'Delta Air Lines', 'United Airlines', 'Southwest Airlines'];
 
@@ -300,6 +302,14 @@ export const FlightSection: React.FC = () => {
                 >
                   <MapPin className="h-4 w-4" />
                   <span>{showFlightMap ? 'Hide Map' : 'Show Routes'}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowFlightTracker(true)}
+                  className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-6 py-3 rounded-full hover:from-green-600 hover:to-emerald-600 transition-all transform hover:scale-105 flex items-center space-x-2 font-semibold shadow-lg"
+                >
+                  <Plane className="h-4 w-4" />
+                  <span>Track Flights</span>
                 </button>
                 <button
                   type="submit"
@@ -779,6 +789,21 @@ export const FlightSection: React.FC = () => {
                   </div>
                 </form>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Flight Tracker Modal */}
+        {showFlightTracker && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+            <div className="relative w-full max-w-7xl max-h-[95vh] overflow-y-auto">
+              <button
+                onClick={() => setShowFlightTracker(false)}
+                className="absolute top-4 right-4 text-gray-400 hover:text-blue-600 transition-colors z-10 bg-white rounded-full p-3 shadow-lg"
+              >
+                <X className="h-6 w-6" />
+              </button>
+              <FlightTracker onClose={() => setShowFlightTracker(false)} />
             </div>
           </div>
         )}

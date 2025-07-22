@@ -72,6 +72,17 @@ export const Header: React.FC<HeaderProps> = ({
                 My Bookings
               </button>
             )}
+            <button
+              onClick={() => {
+                // Trigger flight tracker from any section
+                const event = new CustomEvent('openFlightTracker');
+                window.dispatchEvent(event);
+              }}
+              className="inline-flex items-center px-3 pt-1 text-sm font-medium text-white text-opacity-80 hover:text-white hover:bg-white hover:bg-opacity-10 rounded transition-colors"
+            >
+              <Plane className="h-4 w-4 mr-1" />
+              Track Flight
+            </button>
           </nav>
 
           {/* User Menu */}
@@ -172,6 +183,17 @@ export const Header: React.FC<HeaderProps> = ({
                 My Bookings
               </button>
             )}
+            <button
+              onClick={() => {
+                const event = new CustomEvent('openFlightTracker');
+                window.dispatchEvent(event);
+                setMobileMenuOpen(false);
+              }}
+              className="block px-3 py-2 text-base font-medium w-full text-left text-white text-opacity-80 hover:text-white hover:bg-white hover:bg-opacity-10 rounded-lg"
+            >
+              <Plane className="h-4 w-4 inline mr-2" />
+              Track Flight
+            </button>
           </div>
           <div className="px-4 py-3 border-t border-white border-opacity-20 bg-gradient-to-b from-pink-600 to-orange-500">
             <button

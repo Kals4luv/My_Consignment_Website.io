@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { X } from 'lucide-react';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
 import { ConsignmentSection } from './components/ConsignmentSection';
@@ -7,6 +8,7 @@ import { Footer } from './components/Footer';
 import { AuthModal } from './components/AuthModal';
 import { BookingManagement } from './components/BookingManagement';
 import { ShoppingCart } from './components/ShoppingCart';
+import { FlightTracker } from './components/FlightTracker';
 import { UserProvider } from './contexts/UserContext';
 import { CartProvider } from './contexts/CartContext';
 
@@ -15,6 +17,17 @@ function App() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showBookingManagement, setShowBookingManagement] = useState(false);
   const [showCart, setShowCart] = useState(false);
+  const [showFlightTracker, setShowFlightTracker] = useState(false);
+
+  // Listen for flight tracker events from header
+  React.useEffect(() => {
+    const handleOpenFlightTracker = () => {
+      setShowFlightTracker(true);
+    };
+
+    window.addEventListener('openFlightTracker', handleOpenFlightTracker);
+    return () => window.removeEventListener('openFlightTracker', handleOpenFlightTracker);
+  }, []);
 
   return (
     <UserProvider>
@@ -53,6 +66,20 @@ function App() {
           
           {showCart && (
             <ShoppingCart onClose={() => setShowCart(false)} />
+          )}
+          
+          {showFlightTracker && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+              <div className="relative w-full max-w-7xl max-h-[95vh] overflow-y-auto">
+                <button
+                  onClick={() => setShowFlightTracker(false)}
+                  className="absolute top-4 right-4 text-gray-400 hover:text-blue-600 transition-colors z-10 bg-white rounded-full p-3 shadow-lg"
+                >
+                  <X className="h-6 w-6" />
+                </button>
+                <FlightTracker onClose={() => setShowFlightTracker(false)} />
+              </div>
+            </div>
           )}
         </div>
       </CartProvider>
