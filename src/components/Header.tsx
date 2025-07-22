@@ -1,5 +1,5 @@
 import React from 'react';
-import { Plane, Package, User, Menu, X, ShoppingCart } from 'lucide-react';
+import { Plane, Package, User, Menu, X, ShoppingCart, Shield } from 'lucide-react';
 import { useUser } from '../contexts/UserContext';
 import { useCart } from '../contexts/CartContext';
 
@@ -82,6 +82,16 @@ export const Header: React.FC<HeaderProps> = ({
             >
               <Plane className="h-4 w-4 mr-1" />
               Track Flight
+            </button>
+            <button
+              onClick={() => {
+                const event = new CustomEvent('openTravelInsurance');
+                window.dispatchEvent(event);
+              }}
+              className="inline-flex items-center px-3 pt-1 text-sm font-medium text-white text-opacity-80 hover:text-white hover:bg-white hover:bg-opacity-10 rounded transition-colors"
+            >
+              <Shield className="h-4 w-4 mr-1" />
+              Insurance
             </button>
           </nav>
 
@@ -193,6 +203,17 @@ export const Header: React.FC<HeaderProps> = ({
             >
               <Plane className="h-4 w-4 inline mr-2" />
               Track Flight
+            </button>
+            <button
+              onClick={() => {
+                const event = new CustomEvent('openTravelInsurance');
+                window.dispatchEvent(event);
+                setMobileMenuOpen(false);
+              }}
+              className="block px-3 py-2 text-base font-medium w-full text-left text-white text-opacity-80 hover:text-white hover:bg-white hover:bg-opacity-10 rounded-lg"
+            >
+              <Shield className="h-4 w-4 inline mr-2" />
+              Insurance
             </button>
           </div>
           <div className="px-4 py-3 border-t border-white border-opacity-20 bg-gradient-to-b from-pink-600 to-orange-500">

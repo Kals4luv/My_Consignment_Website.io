@@ -9,6 +9,7 @@ import { AuthModal } from './components/AuthModal';
 import { BookingManagement } from './components/BookingManagement';
 import { ShoppingCart } from './components/ShoppingCart';
 import { FlightTracker } from './components/FlightTracker';
+import { TravelInsurance } from './components/TravelInsurance';
 import { UserProvider } from './contexts/UserContext';
 import { CartProvider } from './contexts/CartContext';
 
@@ -18,15 +19,25 @@ function App() {
   const [showBookingManagement, setShowBookingManagement] = useState(false);
   const [showCart, setShowCart] = useState(false);
   const [showFlightTracker, setShowFlightTracker] = useState(false);
+  const [showTravelInsurance, setShowTravelInsurance] = useState(false);
 
   // Listen for flight tracker events from header
   React.useEffect(() => {
     const handleOpenFlightTracker = () => {
       setShowFlightTracker(true);
     };
+    
+    const handleOpenTravelInsurance = () => {
+      setShowTravelInsurance(true);
+    };
 
     window.addEventListener('openFlightTracker', handleOpenFlightTracker);
-    return () => window.removeEventListener('openFlightTracker', handleOpenFlightTracker);
+    window.addEventListener('openTravelInsurance', handleOpenTravelInsurance);
+    
+    return () => {
+      window.removeEventListener('openFlightTracker', handleOpenFlightTracker);
+      window.removeEventListener('openTravelInsurance', handleOpenTravelInsurance);
+    };
   }, []);
 
   return (
@@ -80,6 +91,10 @@ function App() {
                 <FlightTracker onClose={() => setShowFlightTracker(false)} />
               </div>
             </div>
+          )}
+          
+          {showTravelInsurance && (
+            <TravelInsurance onClose={() => setShowTravelInsurance(false)} />
           )}
         </div>
       </CartProvider>

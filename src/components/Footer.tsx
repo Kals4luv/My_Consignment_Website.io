@@ -52,7 +52,17 @@ export const Footer: React.FC<FooterProps> = ({ setShowBookingManagement }) => {
                 </button>
               </li>
               <li><a href="#" className="hover:text-pink-400 transition-colors">Flight Status</a></li>
-              <li><a href="#" className="hover:text-pink-400 transition-colors">Travel Insurance</a></li>
+              <li>
+                <button 
+                  onClick={() => {
+                    const event = new CustomEvent('openTravelInsurance');
+                    window.dispatchEvent(event);
+                  }}
+                  className="hover:text-pink-400 transition-colors text-left"
+                >
+                  Travel Insurance
+                </button>
+              </li>
             </ul>
           </div>
 
