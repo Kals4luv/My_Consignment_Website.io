@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Search, Filter, Star, Heart, MapPin, SlidersHorizontal, X, Plus, ShoppingCart, Eye } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
-import { MapView, getCityCoordinates } from './MapView';
 
 interface ConsignmentItem {
   id: string;
@@ -113,19 +112,6 @@ export const ConsignmentSection: React.FC = () => {
   const [showMap, setShowMap] = useState(false);
 
   const { addToCart, removeFromCart, isInCart } = useCart();
-
-  const categories = ['All', 'Fashion', 'Accessories', 'Electronics', 'Home & Garden'];
-  const conditions = ['All', 'Like New', 'Excellent', 'Very Good', 'Good'];
-  const locations = ['All', 'New York, NY', 'Los Angeles, CA', 'Chicago, IL', 'Boston, MA', 'Miami, FL', 'Seattle, WA'];
-
-  const filteredItems = mockItems.filter(item => {
-    const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         item.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === 'All' || item.category === selectedCategory;
-    const matchesCondition = selectedCondition === 'All' || item.condition === selectedCondition;
-    const matchesLocation = selectedLocation === 'All' || item.location === selectedLocation;
-    const matchesPrice = item.price >= priceRange.min && item.price <= priceRange.max;
-    return matchesSearch && matchesCategory && matchesCondition && matchesLocation && matchesPrice;
   }).sort((a, b) => {
     switch (sortBy) {
       case 'price-low': return a.price - b.price;
@@ -335,17 +321,14 @@ export const ConsignmentSection: React.FC = () => {
               <h3 className="text-xl font-semibold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
                 Item Locations Map
               </h3>
-              <MapView
-                locations={mapLocations.filter(loc => 
-                  filteredItems.some(item => item.id === loc.id)
-                )}
-                center={[39.8283, -98.5795]}
-                zoom={4}
-                onLocationClick={(location) => {
-                  const item = mockItems.find(item => item.id === location.id);
-                  if (item) viewItemDetails(item);
-                }}
-              />
+              <div className="w-full h-96 bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl flex items-center justify-center">
+                <div className="text-center">
+                  <MapPin className="h-16 w-16 text-purple-500 mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold text-gray-800 mb-2">Interactive Map</h3>
+                  <p className="text-gray-600 mb-4">Map functionality will be available soon</p>
+                  <p className="text-sm text-gray-500">Showing {filteredItems.length} consignment locations</p>
+                </div>
+              </div>
               <p className="text-sm text-gray-600 mt-4 text-center">
                 Click on map markers to view item details • Red marker shows your location (if enabled)
               </p>
