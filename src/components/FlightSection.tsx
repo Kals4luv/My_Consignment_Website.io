@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Search, Calendar, MapPin, Users, Plane, Clock, Star, SlidersHorizontal, X, CreditCard, Download, Share2 } from 'lucide-react';
-import { MapView, getCityCoordinates } from './MapView';
 import { FlightTracker } from './FlightTracker';
 
 interface Flight {
@@ -170,27 +169,6 @@ export const FlightSection: React.FC = () => {
       alert('Flight details copied to clipboard!');
     }
   };
-
-  // Convert flights to map locations and routes
-  const flightLocations = Array.from(new Set([
-    ...filteredAndSortedFlights.map(f => f.from),
-    ...filteredAndSortedFlights.map(f => f.to)
-  ])).map(city => ({
-    id: city,
-    name: city,
-    coordinates: getCityCoordinates(city),
-    type: 'airport' as const,
-    details: {
-      flightCode: filteredAndSortedFlights.find(f => f.from === city || f.to === city)?.airline
-    }
-  }));
-
-  const flightRoutes = filteredAndSortedFlights.map(flight => ({
-    from: getCityCoordinates(flight.from),
-    to: getCityCoordinates(flight.to),
-    airline: flight.airline,
-    flightNumber: flight.id
-  }));
 
   return (
     <section className="py-16 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
@@ -427,16 +405,14 @@ export const FlightSection: React.FC = () => {
               <h3 className="text-xl font-semibold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
                 Flight Routes Map
               </h3>
-              <MapView
-                locations={flightLocations}
-                center={[39.8283, -98.5795]}
-                zoom={4}
-                showFlightPaths={true}
-                flightRoutes={flightRoutes}
-                onLocationClick={(location) => {
-                  console.log('Airport clicked:', location.name);
-                }}
-              />
+              <div className="w-full h-96 bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl flex items-center justify-center">
+                <div className="text-center">
+                  <Plane className="h-16 w-16 text-blue-500 mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold text-gray-800 mb-2">Flight Routes Map</h3>
+                  <p className="text-gray-600 mb-4">Interactive flight tracking will be available soon</p>
+                  <p className="text-sm text-gray-500">Showing {filteredAndSortedFlights.length} flight routes</p>
+                </div>
+              </div>
               <p className="text-sm text-gray-600 mt-4 text-center">
                 Blue markers show airports • Dashed lines show flight routes • Click markers for airport details
               </p>
