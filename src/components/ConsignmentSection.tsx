@@ -97,6 +97,22 @@ const mockItems: ConsignmentItem[] = [
   }
 ];
 
+const categories = ['All', 'Fashion', 'Accessories', 'Electronics', 'Home & Garden'];
+const conditions = ['All', 'Like New', 'Excellent', 'Very Good', 'Good'];
+const locations = ['All', 'New York, NY', 'Los Angeles, CA', 'Chicago, IL', 'Boston, MA', 'Miami, FL', 'Seattle, WA'];
+
+function getCityCoordinates(location: string): [number, number] {
+  const coordinates: { [key: string]: [number, number] } = {
+    'New York, NY': [40.7128, -74.0060],
+    'Los Angeles, CA': [34.0522, -118.2437],
+    'Chicago, IL': [41.8781, -87.6298],
+    'Boston, MA': [42.3601, -71.0589],
+    'Miami, FL': [25.7617, -80.1918],
+    'Seattle, WA': [47.6062, -122.3321]
+  };
+  return coordinates[location] || [0, 0];
+}
+
 export const ConsignmentSection: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -112,6 +128,16 @@ export const ConsignmentSection: React.FC = () => {
   const [showMap, setShowMap] = useState(false);
 
   const { addToCart, removeFromCart, isInCart } = useCart();
+
+  const filteredItems = mockItems.filter(item => {
+    const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         item.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory === 'All' || item.category === selectedCategory;
+    const matchesPrice = item.price >= priceRange.min && item.price <= priceRange.max;
+    const matchesCondition = selectedCondition === 'All' || item.condition === selectedCondition;
+    const matchesLocation = selectedLocation === 'All' || item.location === selectedLocation;
+    
+    return matchesSearch && matchesCategory && matchesPrice && matchesCondition && matchesLocation;
   }).sort((a, b) => {
     switch (sortBy) {
       case 'price-low': return a.price - b.price;
@@ -313,29 +339,29 @@ export const ConsignmentSection: React.FC = () => {
             </div>
           )}
 
-          {/* Active Filters Display */}
-        {/* Interactive Map */}
-        {showMap && (
-          <div className="mb-8 animate-fade-in">
-            <div className="bg-white rounded-2xl shadow-lg p-6 border-2 border-purple-100">
-              <h3 className="text-xl font-semibold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
-                Item Locations Map
-              </h3>
-              <div className="w-full h-96 bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl flex items-center justify-center">
-                <div className="text-center">
-                  <MapPin className="h-16 w-16 text-purple-500 mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold text-gray-800 mb-2">Interactive Map</h3>
-                  <p className="text-gray-600 mb-4">Map functionality will be available soon</p>
-                  <p className="text-sm text-gray-500">Showing {filteredItems.length} consignment locations</p>
+          {/* Interactive Map */}
+          {showMap && (
+            <div className="mb-8 animate-fade-in">
+              <div className="bg-white rounded-2xl shadow-lg p-6 border-2 border-purple-100">
+                <h3 className="text-xl font-semibold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
+                  Item Locations Map
+                </h3>
+                <div className="w-full h-96 bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl flex items-center justify-center">
+                  <div className="text-center">
+                    <MapPin className="h-16 w-16 text-purple-500 mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold text-gray-800 mb-2">Interactive Map</h3>
+                    <p className="text-gray-600 mb-4">Map functionality will be available soon</p>
+                    <p className="text-sm text-gray-500">Showing {filteredItems.length} consignment locations</p>
+                  </div>
                 </div>
+                <p className="text-sm text-gray-600 mt-4 text-center">
+                  Click on map markers to view item details • Red marker shows your location (if enabled)
+                </p>
               </div>
-              <p className="text-sm text-gray-600 mt-4 text-center">
-                Click on map markers to view item details • Red marker shows your location (if enabled)
-              </p>
             </div>
-          </div>
-        )}
+          )}
 
+          {/* Active Filters Display */}
           <div className="flex flex-wrap gap-2 mb-4">
             {searchTerm && (
               <span className="bg-gradient-to-r from-purple-100 to-pink-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1">
@@ -423,9 +449,9 @@ export const ConsignmentSection: React.FC = () => {
                     {item.location}
                   </div>
                   <button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3 rounded-full hover:from-purple-600 hover:to-pink-600 transition-all transform hover:scale-105 font-semibold shadow-lg">
-                    <div className="flex items-center justify-center space-x-2">
+                    <div className="flex items-center justify-center space-x-2" onClick={() => viewItemDetails(item)}>
                       <Eye className="h-4 w-4" />
-                      <span onClick={() => viewItemDetails(item)}>View Details</span>
+                      <span>View Details</span>
                     </div>
                   </button>
                   <div className="flex space-x-2 mt-2">
