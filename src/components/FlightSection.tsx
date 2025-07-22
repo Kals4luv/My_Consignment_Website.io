@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Search, Calendar, MapPin, Users, Plane, Clock, Star, SlidersHorizontal, X, CreditCard, Download, Share2 } from 'lucide-react';
+import { MapView, getCityCoordinates } from './MapView';
 
 interface Flight {
   id: string;
@@ -96,6 +97,7 @@ export const FlightSection: React.FC = () => {
   const [selectedFlight, setSelectedFlight] = useState<Flight | null>(null);
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [bookingStep, setBookingStep] = useState(1);
+  const [showFlightMap, setShowFlightMap] = useState(false);
   const [passengerInfo, setPassengerInfo] = useState({
     firstName: '',
     lastName: '',
@@ -166,6 +168,27 @@ export const FlightSection: React.FC = () => {
       alert('Flight details copied to clipboard!');
     }
   };
+
+  // Convert flights to map locations and routes
+  const flightLocations = Array.from(new Set([
+    ...filteredAndSortedFlights.map(f => f.from),
+    ...filteredAndSortedFlights.map(f => f.to)
+  ])).map(city => ({
+    id: city,
+    name: city,
+    coordinates: getCityCoordinates(city),
+    type: 'airport' as const,
+    details: {
+      flightCode: filteredAndSortedFlights.find(f => f.from === city || f.to === city)?.airline
+    }
+  }));
+
+  const flightRoutes = filteredAndSortedFlights.map(flight => ({
+    from: getCityCoordinates(flight.from),
+    to: getCityCoordinates(flight.to),
+    airline: flight.airline,
+    flightNumber: flight.id
+  }));
 
   return (
     <section className="py-16 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
@@ -269,6 +292,14 @@ export const FlightSection: React.FC = () => {
                 >
                   <SlidersHorizontal className="h-4 w-4" />
                   <span>Filters</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowFlightMap(!showFlightMap)}
+                  className="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-6 py-3 rounded-full hover:from-blue-600 hover:to-purple-600 transition-all transform hover:scale-105 flex items-center space-x-2 font-semibold shadow-lg"
+                >
+                  <MapPin className="h-4 w-4" />
+                  <span>{showFlightMap ? 'Hide Map' : 'Show Routes'}</span>
                 </button>
                 <button
                   type="submit"
@@ -375,6 +406,30 @@ export const FlightSection: React.FC = () => {
               >
                 Clear All Filters
               </button>
+            </div>
+          </div>
+        )}
+
+        {/* Flight Routes Map */}
+        {showFlightMap && (
+          <div className="mb-8 animate-fade-in">
+            <div className="bg-white rounded-2xl shadow-lg p-6 border-2 border-blue-100">
+              <h3 className="text-xl font-semibold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
+                Flight Routes Map
+              </h3>
+              <MapView
+                locations={flightLocations}
+                center={[39.8283, -98.5795]}
+                zoom={4}
+                showFlightPaths={true}
+                flightRoutes={flightRoutes}
+                onLocationClick={(location) => {
+                  console.log('Airport clicked:', location.name);
+                }}
+              />
+              <p className="text-sm text-gray-600 mt-4 text-center">
+                Blue markers show airports • Dashed lines show flight routes • Click markers for airport details
+              </p>
             </div>
           </div>
         )}

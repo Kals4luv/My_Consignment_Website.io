@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Search, Filter, Star, Heart, MapPin, SlidersHorizontal, X, Plus, ShoppingCart, Eye } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
+import { MapView, getCityCoordinates } from './MapView';
 
 interface ConsignmentItem {
   id: string;
@@ -109,6 +110,7 @@ export const ConsignmentSection: React.FC = () => {
   const [cart, setCart] = useState<string[]>([]);
   const [showItemModal, setShowItemModal] = useState<ConsignmentItem | null>(null);
   const [showListingModal, setShowListingModal] = useState(false);
+  const [showMap, setShowMap] = useState(false);
 
   const { addToCart, removeFromCart, isInCart } = useCart();
 
@@ -172,6 +174,19 @@ export const ConsignmentSection: React.FC = () => {
     setShowItemModal(item);
   };
 
+  // Convert consignment items to map locations
+  const mapLocations = mockItems.map(item => ({
+    id: item.id,
+    name: item.location,
+    coordinates: getCityCoordinates(item.location),
+    type: 'consignment' as const,
+    details: {
+      title: item.title,
+      price: item.price,
+      seller: item.seller
+    }
+  }));
+
   return (
     <section className="py-16 bg-gradient-to-br from-yellow-50 via-pink-50 to-purple-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -223,6 +238,13 @@ export const ConsignmentSection: React.FC = () => {
               >
                 <SlidersHorizontal className="h-4 w-4 text-purple-400" />
                 <span className="text-sm font-medium">Filters</span>
+              </button>
+              <button
+                onClick={() => setShowMap(!showMap)}
+                className="flex items-center gap-2 px-4 py-3 border-2 border-purple-200 rounded-full bg-white hover:bg-purple-50 transition-all shadow-lg"
+              >
+                <MapPin className="h-4 w-4 text-purple-400" />
+                <span className="text-sm font-medium">{showMap ? 'Hide Map' : 'Show Map'}</span>
               </button>
             </div>
           </div>
@@ -306,6 +328,31 @@ export const ConsignmentSection: React.FC = () => {
           )}
 
           {/* Active Filters Display */}
+        {/* Interactive Map */}
+        {showMap && (
+          <div className="mb-8 animate-fade-in">
+            <div className="bg-white rounded-2xl shadow-lg p-6 border-2 border-purple-100">
+              <h3 className="text-xl font-semibold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
+                Item Locations Map
+              </h3>
+              <MapView
+                locations={mapLocations.filter(loc => 
+                  filteredItems.some(item => item.id === loc.id)
+                )}
+                center={[39.8283, -98.5795]}
+                zoom={4}
+                onLocationClick={(location) => {
+                  const item = mockItems.find(item => item.id === location.id);
+                  if (item) viewItemDetails(item);
+                }}
+              />
+              <p className="text-sm text-gray-600 mt-4 text-center">
+                Click on map markers to view item details • Red marker shows your location (if enabled)
+              </p>
+            </div>
+          </div>
+        )}
+
           <div className="flex flex-wrap gap-2 mb-4">
             {searchTerm && (
               <span className="bg-gradient-to-r from-purple-100 to-pink-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1">
